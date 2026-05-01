@@ -15,7 +15,8 @@ use serde_json::{json, Value};
 async fn main() {
     let app = Router::new()
     .route("/", get(home))
-    .route("/health", get(health));
+    .route("/health", get(health))
+    .route("/{id}", get(get_user));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
     .await
@@ -34,4 +35,13 @@ async fn health() -> Json<Value>{
     Json(json!({
         "status": "ok"
     }))
+}
+
+async fn get_user(Path(id): Path<u8>) -> String{
+    if id == 13 {
+        return format!("ID invalido!");
+    }
+
+    format!("User {}", id)
+
 }
