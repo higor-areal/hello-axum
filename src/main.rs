@@ -1,6 +1,6 @@
 use axum::{
     extract::Path,
-    routing::{get},
+    routing::{get,post},
     Json,
     Router,
 };
@@ -8,7 +8,11 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-
+#[derive(Deserialize, Serialize)]
+struct User{
+    name: String,
+    age: u8,
+}
 
 
 #[tokio::main]
@@ -16,7 +20,8 @@ async fn main() {
     let app = Router::new()
     .route("/", get(home))
     .route("/health", get(health))
-    .route("/{id}", get(get_user));
+    .route("/{id}", get(get_user))
+    .route("/{echo}", post(echo));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
     .await
@@ -44,4 +49,8 @@ async fn get_user(Path(id): Path<u8>) -> String{
 
     format!("User {}", id)
 
+}
+async fn echo(Json(x): Json<User>) -> Json<User>{
+    println!("Podiriamos usar o {}", x.name);
+    Json(x)
 }
